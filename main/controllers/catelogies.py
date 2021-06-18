@@ -19,7 +19,7 @@ def get_categories():
 def get_category_by_id(_id):
     category = Category.find_by_id(_id)
     if category:
-        data = category.json()
+        data = category_schema.dump(category)
         items = items_schema.dump(category.items.all())
         data["items"] = items
         # data["items"] = [{"id": item.id, "title": item.title} for item in category.items.all()]
@@ -43,4 +43,4 @@ def add_category(name):
         category = Category(name)
         category.save_to_db()
         result = category_schema.dump(category)
-        return jsonify({"message": "Category added ", "category": category})
+        return jsonify({"message": "Category added ", "category": result})
