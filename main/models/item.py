@@ -12,3 +12,12 @@ class Item(db.Model):
     category = db.relationship("Category")
     user = db.relationship("User")
 
+    def __init__(self, title, description, user_id, category_id):
+        self.title = title
+        self.description = description
+        self.user_id = user_id
+        self.category_id = category_id
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
