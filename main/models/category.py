@@ -1,4 +1,5 @@
 from main.db import db
+from .item import Item
 
 
 class Category(db.Model):
