@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 
 from main.config.local import config
@@ -10,9 +11,10 @@ app.secret_key = config.SECRET_KEY
 app.config["JWT_SECRET_KEY"] = config.SECRET_KEY
 
 jwt = JWTManager(app)
+bcrypt = Bcrypt(app)
 
 
-@app.route('/')
+@app.route("/")
 def hello():
     return {"hello": "world"}
 
