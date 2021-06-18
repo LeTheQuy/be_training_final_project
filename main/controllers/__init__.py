@@ -1,1 +1,1 @@
-from . import auth, catelogies, items
+from . import auth, categories, items
