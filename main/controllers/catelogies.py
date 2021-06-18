@@ -1,15 +1,18 @@
 from flask import jsonify
 from flask_jwt_extended import jwt_required
+from marshmallow import ValidationError
 
 from main.app import app
 from main.models.category import Category
+from main.models.schemas import categories_schema, items_schema, category_schema
 
 
 @app.route("/categories", methods=["GET"])
 def get_categories():
-    return jsonify({"categories":
-                        [category.json() for category in Category.find_all()]
-                    })
+    categories = Category.find_all()
+
+    result = categories_schema.dump(categories)
+    return jsonify({"categories": result})
 
 
 @app.route("/categories/<int:_id>", methods=["GET"])
@@ -17,7 +20,9 @@ def get_category_by_id(_id):
     category = Category.find_by_id(_id)
     if category:
         data = category.json()
-        data["items"] = [{"id": item.id, "title": item.title} for item in category.items.all()]
+        items = items_schema.dump(category.items.all())
+        data["items"] = items
+        # data["items"] = [{"id": item.id, "title": item.title} for item in category.items.all()]
     else:
         data = {"message": "invalid category id"}
     return jsonify(data)
@@ -26,10 +31,16 @@ def get_category_by_id(_id):
 @app.route("/categories/<string:name>", methods=["POST"])
 @jwt_required()
 def add_category(name):
+    try:
+        category_schema.load({"name": name})
+    except ValidationError as err:
+        return jsonify({"message": err.messages})
+
     category = Category.find_by_name(name)
     if category:
         return jsonify({"message": "Duplicated category name"}), 400
     else:
         category = Category(name)
         category.save_to_db()
-        return jsonify({"message": "Category added "})
+        result = category_schema.dump(category)
+        return jsonify({"message": "Category added ", "category": category})
