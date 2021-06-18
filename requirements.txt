@@ -3,3 +3,4 @@ Flask-JWT-Extended==4.2.1
 Flask-SQLAlchemy==2.5.1
 Flask-Bcrypt==0.7.1
 PyMySQL==1.0.2
+marshmallow==3.12.1
