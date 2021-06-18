@@ -22,7 +22,6 @@ def get_category_by_id(_id):
         data = category_schema.dump(category)
         items = items_schema.dump(category.items.all())
         data["items"] = items
-        # data["items"] = [{"id": item.id, "title": item.title} for item in category.items.all()]
     else:
         data = {"message": "invalid category id"}
     return jsonify(data)
