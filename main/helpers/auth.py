@@ -20,9 +20,8 @@ def jwt_required(optional=True):
     def decorator_jwt(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            token = request.headers["Authorization"]
             if not optional:
-                if not token or not decode_token(token):
+                if not get_jwt_identity():
                     return jsonify({"message": "Please authenticate."}), 401
             else:
                 pass
@@ -31,3 +30,11 @@ def jwt_required(optional=True):
         return decorated
 
     return decorator_jwt
+
+
+def get_jwt_identity():
+    token = request.headers["Authorization"]
+    if token or not decode_token(token):
+        return False
+    else:
+        return decode_token(token)
