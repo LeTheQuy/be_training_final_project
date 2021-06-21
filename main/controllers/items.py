@@ -1,9 +1,9 @@
 from flask import request
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
 
 from main.app import app
 from main.config.config import config
+from main.helpers.auth import jwt_required, get_jwt_identity
 from main.models.category import Category
 from main.models.item import Item
 from main.models.schemas import item_schema, items_schema
