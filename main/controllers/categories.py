@@ -1,8 +1,8 @@
 from flask import jsonify
-from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
 
 from main.app import app
+from main.helpers.auth import jwt_required
 from main.models.category import Category
 from main.models.schemas import categories_schema, category_schema
 
