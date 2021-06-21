@@ -7,6 +7,3 @@ class _Config(object):
     DEBUG = False
     ITEM_PER_PAGE = None
 
-    @classmethod
-    def get_sqlalchemy_db_uri(cls):
-        return f"mysql+pymysql://{cls.MYSQL_USERNAME}:{cls.MYSQL_PASSWORD}@{cls.MYSQL_HOST}:{cls.MYSQL_PORT}/{cls.MYSQL_DB}"
