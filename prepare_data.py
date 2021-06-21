@@ -7,13 +7,13 @@ from main.models.user import User
 db.drop_all()
 db.create_all()
 
-root_user = User("root", generate_password_hash("123456"))
+root_user = User(username="root", password_hash=generate_password_hash("123456"))
 root_user.save_to_db()
 
 CATEGORIES = ["FOOTBALL", "TENNIS", "VOLLEYBALL", "SWING", "MARATHON", "JOGGING"]
 
 for category in CATEGORIES:
-    Category(category).save_to_db()
+    Category(name=category).save_to_db()
     for i in range(10):
         item = Item(f"{category} Item {i * 1}",
                     f"Item description for category {category}, item {i}: A ball is a round object with various uses. "
