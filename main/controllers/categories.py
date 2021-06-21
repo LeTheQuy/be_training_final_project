@@ -4,7 +4,10 @@ from marshmallow import ValidationError
 from main.app import app
 from main.helpers.auth import jwt_required
 from main.models.category import Category
-from main.models.schemas import categories_schema, category_schema
+from main.schemas.category_schema import CategorySchema
+
+category_schema = CategorySchema()
+categories_schema = CategorySchema(many=True, only=("id", "name"))
 
 
 @app.route("/categories", methods=["GET"])
@@ -36,7 +39,7 @@ def add_category(name):
     if category:
         return jsonify({"message": "Duplicated category name"}), 400
     else:
-        category = Category(name)
+        category = Category(name=name)
         category.save_to_db()
         result = category_schema.dump(category)
         result["message"] = "Category added"

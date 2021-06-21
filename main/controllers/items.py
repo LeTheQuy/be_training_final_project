@@ -6,7 +6,11 @@ from main.config.config import config
 from main.helpers.auth import jwt_required, get_jwt_identity
 from main.models.category import Category
 from main.models.item import Item
-from main.models.schemas import item_schema, items_schema
+from main.schemas.item_schema import ItemSchema
+
+item_schema = ItemSchema(only=("id", "title", "description", "category_id", "category.id", "category.name"))
+
+items_schema = ItemSchema(many=True, only=("id", "title", "description", "category.id", "category.name"))
 
 
 @app.route("/items", methods=["GET"])
@@ -84,10 +88,13 @@ def add_item(category_id):
     if category is None:
         return {"message": "Invalid category id"}, 400
 
-    if Item.find_by_name(request_data["title"]):
+    if Item.find_by_title(request_data["title"]):
         return {"message": "Duplicated item title"}, 400
 
-    item = Item(request_data["title"], request_data["description"], user_id, category_id)
+    item = Item(title=request_data["title"],
+                description=request_data["description"],
+                user_id=user_id,
+                category_id=category_id)
     item.save_to_db()
     result = item_schema.dump(item)
     return {

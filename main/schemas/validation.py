@@ -16,7 +16,7 @@ def exist_category(category_id):
         raise ValidationError("Invalid category id")
 
 
-def load_data_by_schema(schema):
+def load_request_data_by_schema(schema):
     def decorator_schema(f):
         @functools.wraps(f)
         def decorated(*args, **kwargs):
