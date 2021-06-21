@@ -9,6 +9,7 @@ class _LocalConfig(_Config):
     MYSQL_DB = "be_training"
     DEBUG = True
     SECRET_KEY = "quydzzzz"
+    ITEM_PER_PAGE = 10
 
 
 config = _LocalConfig
