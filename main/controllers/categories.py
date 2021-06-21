@@ -4,15 +4,14 @@ from marshmallow import ValidationError
 
 from main.app import app
 from main.models.category import Category
-from main.models.schemas import categories_schema, items_schema, category_schema
+from main.models.schemas import categories_schema, category_schema
 
 
 @app.route("/categories", methods=["GET"])
 def get_categories():
     categories = Category.find_all()
-
     result = categories_schema.dump(categories)
-    return jsonify({"categories": result})
+    return result
 
 
 @app.route("/categories/<int:_id>", methods=["GET"])
@@ -20,8 +19,6 @@ def get_category_by_id(_id):
     category = Category.find_by_id(_id)
     if category:
         data = category_schema.dump(category)
-        items = items_schema.dump(category.items.all())
-        data["items"] = items
     else:
         data = {"message": "invalid category id"}
     return jsonify(data)
@@ -42,4 +39,5 @@ def add_category(name):
         category = Category(name)
         category.save_to_db()
         result = category_schema.dump(category)
-        return jsonify({"message": "Category added ", "category": result})
+        result["message"] = "Category added"
+        return jsonify(result)
