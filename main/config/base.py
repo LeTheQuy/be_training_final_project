@@ -5,7 +5,8 @@ class _Config(object):
     MYSQL_PASSWORD = None
     MYSQL_DB = None
     DEBUG = False
+    ITEM_PER_PAGE = None
 
     @classmethod
-    def get_sqlalchemy_db_uri(self):
-        return f"mysql+pymysql://{self.MYSQL_USERNAME}:{self.MYSQL_PASSWORD}@{self.MYSQL_HOST}:{self.MYSQL_PORT}/{self.MYSQL_DB}"
+    def get_sqlalchemy_db_uri(cls):
+        return f"mysql+pymysql://{cls.MYSQL_USERNAME}:{cls.MYSQL_PASSWORD}@{cls.MYSQL_HOST}:{cls.MYSQL_PORT}/{cls.MYSQL_DB}"
