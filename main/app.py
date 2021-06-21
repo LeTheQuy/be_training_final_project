@@ -11,7 +11,6 @@ app.secret_key = config.SECRET_KEY
 app.config["JWT_SECRET_KEY"] = config.SECRET_KEY
 
 jwt = JWTManager(app)
-bcrypt = Bcrypt(app)
 
 
 @app.route("/")

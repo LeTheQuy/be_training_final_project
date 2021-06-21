@@ -1,9 +1,10 @@
-from main.app import bcrypt
+import bcrypt
 
 
 def generate_password_hash(password):
-    return bcrypt.generate_password_hash(password)
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password, salt)
 
 
 def verify_password_with_password_hash(password, password_hash):
-    return bcrypt.check_password_hash(password_hash, password)
+    return bcrypt.checkpw(password, password_hash)
