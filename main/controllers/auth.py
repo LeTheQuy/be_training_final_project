@@ -1,8 +1,8 @@
 from flask import request, jsonify
-from flask_jwt_extended import create_access_token
 from marshmallow import ValidationError
 
 from main.app import app
+from main.helpers.auth import encode_identity
 from main.helpers.pw import generate_password_hash, verify_password_with_password_hash
 from main.models.schemas import user_schema
 from main.models.user import User
@@ -36,7 +36,7 @@ def sign_in():
     user = User.find_by_username(request_data["username"])
     if user:
         if verify_password_with_password_hash(request_data["password"], user.password_hash):
-            access_token = create_access_token(identity=user.id, fresh=True)
+            access_token = encode_identity(identity=user.id)
             return {"access_token": access_token}, 200
         else:
             return {"message": "Incorrect Password"}, 401
