@@ -8,7 +8,7 @@ class _LocalConfig(_Config):
     MYSQL_PASSWORD = "quyngao123456"
     MYSQL_DB = "be_training"
     DEBUG = True
-    SECRET_KEY = "quydzzzz"
+    SECRET_KEY = "be_training_g0tit@^&#quydz__tqn_"
     ITEM_PER_PAGE = 10
 
 
