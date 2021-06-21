@@ -11,21 +11,16 @@ class Item(db.Model):
     description = db.Column(db.String(1000), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
+
     category = db.relationship("Category")
     user = db.relationship("User")
-
-    def __init__(self, title, description, user_id, category_id):
-        self.title = title
-        self.description = description
-        self.user_id = user_id
-        self.category_id = category_id
 
     @classmethod
     def find_by_id(cls, _id):
         return cls.query.get(_id)
 
     @classmethod
-    def find_by_name(cls, title):
+    def find_by_title(cls, title):
         return cls.query.filter_by(title=title).first()
 
     @classmethod

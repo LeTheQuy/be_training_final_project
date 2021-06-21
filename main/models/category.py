@@ -1,16 +1,13 @@
-from sqlalchemy import asc
-
 from main.db import db
 
 
 class Category(db.Model):
     __tablename__ = "categories"
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(45), nullable=False, unique=True)
-    items = db.relationship("Item", lazy="dynamic")
 
-    def __init__(self, name):
-        self.name = name
+    items = db.relationship("Item", lazy="dynamic")
 
     @classmethod
     def find_by_id(cls, _id):
@@ -22,7 +19,7 @@ class Category(db.Model):
 
     @classmethod
     def find_all(cls):
-        return cls.query.order_by(asc(cls.name))
+        return cls.query.all()
 
     def save_to_db(self):
         db.session.add(self)
