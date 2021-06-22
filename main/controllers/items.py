@@ -5,7 +5,7 @@ from main.helpers.auth import jwt_required
 from main.models.category import Category
 from main.models.item import Item
 from main.schemas.item_schema import ItemSchema
-from main.schemas.category_item_schema import get_item_by_condition
+from main.schemas.category_item_schema import CategoryItemSchema
 from main.schemas.pagination_schema import PaginationSchema
 from main.schemas.order_item_schema import OrderItemSchema
 from main.schemas.validation import load_request_data_by_schema
@@ -13,6 +13,11 @@ from main.schemas.validation import load_request_data_by_schema
 item_schema = ItemSchema(only=("id", "title", "description", "category_id", "category.id", "category.name"))
 
 items_schema = ItemSchema(many=True, only=("id", "title", "description", "category.id", "category.name"))
+category_item_schema = CategoryItemSchema()
+
+
+def get_item_by_condition(**kwargs):
+    return category_item_schema.load(kwargs)
 
 
 @app.route("/items", methods=["GET"])
