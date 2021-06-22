@@ -4,9 +4,9 @@
 
 This is BE system that provides some Restful API to  serve Simple manage item application. The application provides a list of items within a variety of categories as well as provides a user registration and authentication system. Registered users will have the ability to post, edit, and delete their own items.
 
-More detail about database design, API specs, project structure, Please visit [here](https://docs.google.com/document/d/13WE0p50ecmviwt3JmI6BuaJbkb8jQMxjvuPZZ38LapA/edit#heading=h.vcozbswwqf8l) 
-
-Technical: Python, Flask, SQLAchemy, JWT, bcrypt, marshmallow
+More detail about DB design, API specs, roject structure, Please visit [here](https://docs.google.com/document/d/13WE0p50ecmviwt3JmI6BuaJbkb8jQMxjvuPZZ38LapA/edit#heading=h.vcozbswwqf8l) 
+P
+Technical: Python, MySQL, Flask, SQLAchemy, JWT, bcrypt, marshmallow
     
 ## Installation and Setup
 
