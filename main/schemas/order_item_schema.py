@@ -10,6 +10,6 @@ class OrderItemSchema(Schema):
 
     @post_load(pass_many=True)
     def wrap(self, data, many, **kwargs):
-        if data["order"] and data["items_per_page"]:
+        if "order" in data and "items_per_page" in data:
             return Item.get_latest_added_list(data["items_per_page"])
         return Item.find_all(data["items_per_page"])
