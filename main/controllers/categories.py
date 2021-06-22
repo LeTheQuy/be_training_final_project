@@ -21,7 +21,7 @@ def get_category_by_id(_id):
     if category:
         data = category_schema.dump(category)
     else:
-        data = {"message": "invalid category id"}
+        data = {"message": "invalid category id"}, 400
     return data
 
 
