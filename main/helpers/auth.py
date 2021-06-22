@@ -1,7 +1,7 @@
-from functools import wraps
+import functools
 
 import jwt
-from flask import request, jsonify
+from flask import request
 
 from main.config.config import config
 
@@ -12,19 +12,17 @@ def encode_identity(identity):
 
 
 def decode_token(token):
-    result = jwt.decode(token, config.SECRET_KEY, algorithms="HS256")
-    return result["identity"]
+    return jwt.decode(token, config.SECRET_KEY, algorithms="HS256")
 
 
-def jwt_required(optional=True):
+def jwt_required(optional=False):
     def decorator_jwt(f):
-        @wraps(f)
+        @functools.wraps(f)
         def decorated(*args, **kwargs):
-            if not optional:
-                if not get_jwt_identity():
-                    return jsonify({"message": "Please authenticate."}), 401
-            else:
-                pass
+            identity = get_jwt_identity()
+            if not optional and not identity:
+                return {"message": "Unauthorized."}, 401
+            kwargs["user_id"] = identity
             return f(*args, **kwargs)
 
         return decorated
@@ -34,7 +32,7 @@ def jwt_required(optional=True):
 
 def get_jwt_identity():
     token = request.headers["Authorization"]
-    if token or not decode_token(token):
-        return False
+    if not token or not decode_token(token):
+        return None
     else:
-        return decode_token(token)
+        return decode_token(token)["identity"]
