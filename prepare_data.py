@@ -13,10 +13,13 @@ root_user.save_to_db()
 CATEGORIES = ["FOOTBALL", "TENNIS", "VOLLEYBALL", "SWING", "MARATHON", "JOGGING"]
 
 for category in CATEGORIES:
-    Category(name=category).save_to_db()
+    c = Category(name=category)
+    c.save_to_db()
     for i in range(10):
-        item = Item(f"{category} Item {i * 1}",
-                    f"Item description for category {category}, item {i}: A ball is a round object with various uses. "
-                    f"It is used in ball games, where the play of the game follows the state of the ball as it is hit, "
-                    f"kicked or thrown by players. ", root_user.id, Category.find_all()[0].id)
+        item = Item(title=f"{category} Item {i * 1}",
+                    description=f"Item description for category {category}, item {i}: A ball is a round object with "
+                                f"various uses. It is used in ball games, where the play of the game follows the state"
+                                f" of the ball as it is hit, kicked or thrown by players.",
+                    user_id=root_user.id,
+                    category_id=c.id)
         item.save_to_db()
