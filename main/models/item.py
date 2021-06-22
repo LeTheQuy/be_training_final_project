@@ -35,8 +35,8 @@ class Item(db.Model):
         return cls.query.order_by(desc(cls.id)).limit(limit)
 
     @classmethod
-    def get_items_per_page(cls, page, per_page):
-        return cls.query.paginate(page, per_page, error_out=True)
+    def get_items_per_page(cls, category_id, page, per_page):
+        return cls.query.filter_by(category_id=category_id).paginate(page, per_page, error_out=True)
 
     def save_to_db(self):
         db.session.add(self)
