@@ -4,6 +4,7 @@ from flask import request
 from marshmallow import ValidationError
 
 from main.models.category import Category
+from main.models.item import Item
 
 
 def must_not_be_blank(data):
@@ -14,6 +15,11 @@ def must_not_be_blank(data):
 def exist_category(category_id):
     if Category.find_by_id(category_id) is None:
         raise ValidationError("Invalid category id")
+
+
+def exist_item(item_id):
+    if Item.find_by_id(item_id) is None:
+        raise ValidationError("Invalid item id")
 
 
 def load_request_data_by_schema(schema):
