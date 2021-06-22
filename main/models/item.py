@@ -24,8 +24,11 @@ class Item(db.Model):
         return cls.query.filter_by(title=title).first()
 
     @classmethod
-    def find_all(cls):
-        return cls.query.all()
+    def find_all(cls, limit=None):
+        if limit:
+            return cls.query.limit(limit).all()
+        else:
+            return cls.query.all()
 
     @classmethod
     def get_latest_added_list(cls, limit):
@@ -42,4 +45,3 @@ class Item(db.Model):
     def delete_on_db(self):
         db.session.delete(self)
         db.session.commit()
-
