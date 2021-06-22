@@ -27,8 +27,7 @@ def get_category_by_id(_id):
 
 @app.route("/categories/<string:name>", methods=["POST"])
 @jwt_required()
-@load_request_data_by_schema(category_schema)
-def add_category(name):
+def add_category(name, user_id):
     category = Category.find_by_name(name)
     if category:
         return {"message": "Duplicated category name"}, 400
