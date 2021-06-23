@@ -15,6 +15,10 @@ class User(db.Model):
     def find_by_username(cls, username):
         return cls.query.filter_by(username=username).one_or_none()
 
+    @classmethod
+    def find_by_id(cls, _id):
+        return cls.query.get(_id)
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
