@@ -8,25 +8,22 @@ from main.models.user import User
 
 
 def encode_identity(identity):
-    try:
-        encoded_jwt = jwt.encode({"identity": identity}, config.SECRET_KEY, algorithm="HS256")
-        return encoded_jwt
-    except Exception as e:
-        abort(400, description=str(e))
+    encoded_jwt = jwt.encode({"identity": identity}, config.SECRET_KEY, algorithm="HS256")
+    return encoded_jwt
 
 
 def decode_token(token):
-    try:
-        return jwt.decode(token, config.SECRET_KEY, algorithms="HS256")
-    except Exception as e:
-        abort(401, description=str(e))
+    return jwt.decode(token, config.SECRET_KEY, algorithms="HS256")
 
 
 def _get_jwt_identity():
     if "Authorization" not in request.headers or not request.headers["Authorization"]:
         return None
     token = request.headers["Authorization"]
-    decoded_jwt = decode_token(token)
+    try:
+        decoded_jwt = decode_token(token)
+    except Exception as e:
+        abort(401, description=str(e))
 
     if not decoded_jwt or not decoded_jwt["identity"]:
         return None

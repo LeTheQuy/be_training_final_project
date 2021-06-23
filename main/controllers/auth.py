@@ -29,6 +29,9 @@ def register_user(request_data):
 def sign_in(request_data):
     user = User.find_by_username(request_data["username"])
     if user and verify_password_with_password_hash(request_data["password"], user.password_hash):
-        access_token = encode_identity(identity=user.id)
-        return {"access_token": access_token}, 200
+        try:
+            access_token = encode_identity(identity=user.id)
+            return {"access_token": access_token}, 200
+        except Exception as e:
+            abort(400, description=str(e))
     abort(401)
