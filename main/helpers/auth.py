@@ -37,7 +37,7 @@ def jwt_required(required=True):
         @functools.wraps(f)
         def decorated(*args, **kwargs):
             identity = _get_jwt_identity()
-            if request and not identity:
+            if required and not identity:
                 abort(401)
             # Auto add user_id as kwargs for a method
             kwargs["user_id"] = identity
