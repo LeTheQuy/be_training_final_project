@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 
 from main.config.config import config
 
@@ -8,7 +8,27 @@ app.config[
                                  f"@{config.MYSQL_HOST}:{config.MYSQL_PORT}/{config.MYSQL_DB}"
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.secret_key = config.SECRET_KEY
+app.secret_key = config.SECRET_KEY  # todo
+
+
+@app.errorhandler(404)
+def resource_not_found(e):
+    return jsonify(message=str(e)), 404
+
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return jsonify(message=str(e)), 500
+
+
+@app.errorhandler(401)
+def unauthorized(e):
+    return {"message": "Unauthorized!", }, 401
+
+
+@app.errorhandler(403)
+def forbidden(e):
+    return {"message": "Forbidden, permission deny"}, 401
 
 
 def _register_modules():
