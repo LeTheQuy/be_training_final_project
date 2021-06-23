@@ -24,6 +24,6 @@ class ItemSchema(Schema):
         return data
 
 
-def dump_single_item(item):
-    item_schema = ItemSchema(only=("id", "title", "description", "category.id", "category.name"))
+def dump_simple_item(item, many=False):
+    item_schema = ItemSchema(many=many, only=("id", "title", "description", "category.id", "category.name"))
     return item_schema.dump(item)
