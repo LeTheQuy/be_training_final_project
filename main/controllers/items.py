@@ -1,72 +1,54 @@
-from marshmallow import ValidationError
-
 from main.app import app
 from main.helpers.auth import jwt_required
+from main.helpers.parser import parse_data
 from main.models.category import Category
 from main.models.item import Item
-from main.schemas.item_schema import ItemSchema
-from main.schemas.category_item_schema import CategoryItemSchema
+from main.schemas.base.item import ItemSchema, dump_simple_item
 from main.schemas.pagination_schema import PaginationSchema
-from main.schemas.order_item_schema import OrderItemSchema
-from main.schemas.validation import load_request_data_by_schema
-
-item_schema = ItemSchema(only=("id", "title", "description", "category_id", "category.id", "category.name"))
-
-items_schema = ItemSchema(many=True, only=("id", "title", "description", "category.id", "category.name"))
-category_item_schema = CategoryItemSchema()
-
-
-def get_item_by_condition(**kwargs):
-    return category_item_schema.load(kwargs)
+from main.helpers.schema import load_request_data_by_schema
 
 
 @app.route("/items", methods=["GET"])
-@load_request_data_by_schema(OrderItemSchema())
+@load_request_data_by_schema(PaginationSchema())
 def get_latest_added_items(request_data):
-    items = request_data
-    result = items_schema.dump(items)
+    if "order" in request_data:
+        items = Item.get_latest_added_list(request_data["items_per_page"])
+    else:
+        items = Item.find_all(request_data["items_per_page"])
+
+    result = dump_simple_item(items, many=True)
     return result
 
 
-@app.route("/categories/<int:category_id>/items")
+@app.route("/categories/<int:category_id>/items", methods=["GET"])
+@parse_data()
 @load_request_data_by_schema(PaginationSchema())
-def get_items_by_category_id(category_id, request_data):
-    category = Category.find_by_id(category_id)
-    if category is None:
-        return {"message": "Invalid category id"}, 400
-
-    pagination = Item.get_items_per_page(category_id=category_id,
-                                         page=request_data["page"],
-                                         per_page=request_data["items_per_page"])
+def get_items_by_category_id(category_id, request_data, category):
+    pagination = category.items.paginate(page=request_data["page"], per_page=request_data["items_per_page"],
+                                         error_out=True)
     items = pagination.items
 
-    result = items_schema.dump(items)
+    result = dump_simple_item(items, many=True)
     result["current_page"] = request_data["page"]
     result["total_items"] = pagination.total
-    result["items_per_page"] = len(items)
+    result["items_per_page"] = request_data["items_per_page"]
     return result
 
 
 @app.route("/categories/<int:category_id>/items/<int:item_id>", methods=["GET"])
-@jwt_required(optional=False)
-def get_item_detail(category_id, item_id, user_id):
-    try:
-        item = get_item_by_condition(category_id=category_id, item_id=item_id, user_id=user_id)
-    except ValidationError as err:
-        return {"message": err.messages}, 400
-    result = item_schema.dump(item)
-    result["editable"] = False if not user_id else True
+@jwt_required(required=False)
+@parse_data(check_editable=False)
+def get_item_detail(category_id, item_id, user_id, category, item):
+    result = dump_simple_item(item)
+    result["editable"] = True if user_id and item.user_id == user_id else False
     return result
 
 
 @app.route("/categories/<int:category_id>/items", methods=["POST"])
 @jwt_required()
-@load_request_data_by_schema(item_schema)
-def add_item(category_id, user_id, request_data):
-    category = Category.find_by_id(category_id)
-    if category is None:
-        return {"message": "Invalid category id"}, 400
-
+@parse_data()
+@load_request_data_by_schema(ItemSchema(exclude=("user_id", "category_id",)))
+def add_item(category_id, user_id, category, request_data):
     if Item.find_by_title(request_data["title"]):
         return {"message": "Duplicated item title"}, 400
 
@@ -75,37 +57,41 @@ def add_item(category_id, user_id, request_data):
                 user_id=user_id,
                 category_id=category_id)
     item.save_to_db()
-    result = item_schema.dump(item)
-    result["message"] = "Item added"
 
+    item_dump = dump_simple_item(item)
+    result = {"message": "Item added", "item": item_dump}
     return result, 201
 
 
 @app.route("/categories/<int:category_id>/items/<int:item_id>", methods=["PUT"])
 @jwt_required()
-@load_request_data_by_schema(item_schema)
-def update_item_info(category_id, item_id, user_id, request_data):
-    try:
-        item = get_item_by_condition(category_id=category_id, item_id=item_id, user_id=user_id)
-    except ValidationError as err:
-        return {"message": err.messages}, 400
+@parse_data()
+@load_request_data_by_schema(ItemSchema(exclude=("user_id",)))
+def update_item_info(category_id, item_id, user_id, category, item, request_data):
+    new_category = Category.find_by_id(request_data["category_id"])
+
+    if new_category is None:
+        return {"message": "Invalid new category id"}, 400
+
+    if Item.find_by_title(request_data["title"]):
+        return {"message": "Duplicated item title"}, 400
+
     item.title = request_data["title"]
     item.description = request_data["description"]
     item.category_id = request_data["category_id"]
     item.save_to_db()
-    result = item_schema.dump(item)
-    result["message"] = "Item updated"
+
+    item_dump = dump_simple_item(item)
+    result = {"message": "Item updated", "item": item_dump}
     return result
 
 
 @app.route("/categories/<int:category_id>/items/<int:item_id>", methods=["DELETE"])
 @jwt_required()
-def delete_item_info(category_id, item_id, user_id):
-    try:
-        item = get_item_by_condition(category_id=category_id, item_id=item_id, user_id=user_id)
-    except ValidationError as err:
-        return {"message": err.messages}, 400
+@parse_data()
+def delete_item_info(category_id, item_id, user_id, category, item):
     item.delete_on_db()
-    result = item_schema.dump(item)
-    result["message"] = "Item deleted"
+
+    item_dump = dump_simple_item(item)
+    result = {"message": "Item deleted", "item": item_dump}
     return result
