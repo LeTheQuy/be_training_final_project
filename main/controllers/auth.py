@@ -6,7 +6,7 @@ from main.helpers.pw import generate_password_hash, verify_password_with_passwor
 from main.models.user import User
 from main.schemas.base.user import UserSchema
 from main.schemas.user_signup import UserSignUpSchema
-from main.schemas.validation import load_request_data_by_schema
+from main.helpers.schema import load_request_data_by_schema
 
 user_schema = UserSchema(exclude=("items",))
 
