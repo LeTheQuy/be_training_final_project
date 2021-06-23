@@ -21,7 +21,7 @@ class Item(db.Model):
 
     @classmethod
     def find_by_title(cls, title):
-        return cls.query.filter_by(title=title).first()
+        return cls.query.filter_by(title=title).one_or_none()
 
     @classmethod
     def find_all(cls, limit=None):
@@ -37,11 +37,3 @@ class Item(db.Model):
     @classmethod
     def get_items_per_page(cls, category_id, page, per_page):
         return cls.query.filter_by(category_id=category_id).paginate(page, per_page, error_out=True)
-
-    def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete_on_db(self):
-        db.session.delete(self)
-        db.session.commit()
