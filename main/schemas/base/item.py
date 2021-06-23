@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validate, pre_load, post_dump
+from marshmallow import Schema, fields, validate, post_dump, post_load
 
 
 class ItemSchema(Schema):
@@ -11,7 +11,7 @@ class ItemSchema(Schema):
     user = fields.Nested("UserSchema", exclude={"items"}, dump_only=True)
     category = fields.Nested("CategorySchema", exclude={"items"}, dump_only=True)
 
-    @pre_load
+    @post_load
     def process_input(self, data, **kwargs):
         data["title"] = data["title"].lower().strip()
         data["description"] = data["description"].strip()
@@ -20,5 +20,10 @@ class ItemSchema(Schema):
     @post_dump(pass_many=True)
     def wrap(self, data, many, **kwargs):
         if many:
-            return {"items: data"}
+            return {"items": data}
         return data
+
+
+def dump_single_item(item):
+    item_schema = ItemSchema(only=("id", "title", "description", "category.id", "category.name"))
+    return item_schema.dump(item)
