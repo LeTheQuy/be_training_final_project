@@ -1,7 +1,8 @@
 from main.db import db
+from main.models.db_action import DBAction
 
 
-class Category(db.Model):
+class Category(db.Model, DBAction):
     __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -20,7 +21,3 @@ class Category(db.Model):
     @classmethod
     def find_all(cls):
         return cls.query.all()
-
-    def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()

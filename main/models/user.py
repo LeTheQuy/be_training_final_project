@@ -1,8 +1,9 @@
 from main.db import db
+from .db_action import DBAction
 from .item import Item
 
 
-class User(db.Model):
+class User(db.Model, DBAction):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -19,6 +20,3 @@ class User(db.Model):
     def find_by_id(cls, _id):
         return cls.query.get(_id)
 
-    def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()

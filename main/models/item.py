@@ -1,9 +1,10 @@
 from sqlalchemy import desc
 
 from main.db import db
+from main.models.db_action import DBAction
 
 
-class Item(db.Model):
+class Item(db.Model, DBAction):
     __tablename__ = "items"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -37,11 +38,3 @@ class Item(db.Model):
     @classmethod
     def get_items_per_page(cls, category_id, page, per_page):
         return cls.query.filter_by(category_id=category_id).paginate(page, per_page, error_out=True)
-
-    def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete_on_db(self):
-        db.session.delete(self)
-        db.session.commit()
