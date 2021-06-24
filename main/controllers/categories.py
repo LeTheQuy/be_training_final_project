@@ -1,5 +1,5 @@
 from main.app import app
-from main.helpers.parser import parse_data
+from main.helpers.parser import parse_category
 from main.models.category import Category
 from main.schemas.base.category import CategorySchema
 
@@ -12,7 +12,7 @@ def get_categories():
 
 
 @app.route("/categories/<int:category_id>", methods=["GET"])
-@parse_data()
+@parse_category()
 def get_category_by_id(category_id, category):
     data = CategorySchema().dump(category)
     return data

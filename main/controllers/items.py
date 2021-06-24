@@ -1,6 +1,6 @@
 from main.app import app
 from main.helpers.auth import jwt_required
-from main.helpers.parser import parse_data
+from main.helpers.parser import parse_category, parse_item, parse_editable_item
 from main.models.category import Category
 from main.models.item import Item
 from main.schemas.base.item import ItemSchema, dump_simple_item
@@ -21,7 +21,7 @@ def get_latest_added_items(request_data):
 
 
 @app.route("/categories/<int:category_id>/items", methods=["GET"])
-@parse_data()
+@parse_category()
 @load_request_data_by_schema(PaginationSchema())
 def get_items_by_category_id(category_id, request_data, category):
     pagination = category.items.paginate(page=request_data["page"], per_page=request_data["items_per_page"],
@@ -37,16 +37,18 @@ def get_items_by_category_id(category_id, request_data, category):
 
 @app.route("/categories/<int:category_id>/items/<int:item_id>", methods=["GET"])
 @jwt_required(required=False)
-@parse_data(check_editable=False)
-def get_item_detail(category_id, item_id, user_id, category, item):
+@parse_category()
+@parse_item()
+@parse_editable_item()
+def get_item_detail(category_id, item_id, user_id, category, item, editable):
     result = dump_simple_item(item)
-    result["editable"] = True if user_id and item.user_id == user_id else False
+    result["editable"] = editable
     return result
 
 
 @app.route("/categories/<int:category_id>/items", methods=["POST"])
 @jwt_required()
-@parse_data()
+@parse_category()
 @load_request_data_by_schema(ItemSchema(exclude=("user_id", "category_id",)))
 def add_item(category_id, user_id, category, request_data):
     if Item.find_by_title(request_data["title"]):
@@ -65,11 +67,15 @@ def add_item(category_id, user_id, category, request_data):
 
 @app.route("/categories/<int:category_id>/items/<int:item_id>", methods=["PUT"])
 @jwt_required()
-@parse_data()
+@parse_category()
+@parse_item()
+@parse_editable_item()
 @load_request_data_by_schema(ItemSchema(exclude=("user_id",)))
-def update_item_info(category_id, item_id, user_id, category, item, request_data):
-    new_category = Category.find_by_id(request_data["category_id"])
+def update_item_info(category_id, item_id, user_id, category, item, editable, request_data):
+    if not editable:
+        return {"message": "This item is not editable by yourself"}, 403
 
+    new_category = Category.find_by_id(request_data["category_id"])
     if new_category is None:
         return {"message": "Invalid new category id"}, 400
 
@@ -88,10 +94,14 @@ def update_item_info(category_id, item_id, user_id, category, item, request_data
 
 @app.route("/categories/<int:category_id>/items/<int:item_id>", methods=["DELETE"])
 @jwt_required()
-@parse_data()
-def delete_item_info(category_id, item_id, user_id, category, item):
-    item.delete_on_db()
+@parse_category()
+@parse_item()
+@parse_editable_item()
+def delete_item_info(category_id, item_id, user_id, category, item, editable):
+    if not editable:
+        return {"message": "This item is not editable by yourself"}, 403
 
+    item.delete_on_db()
     item_dump = dump_simple_item(item)
     result = {"message": "Item deleted", "item": item_dump}
     return result
