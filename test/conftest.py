@@ -46,7 +46,7 @@ def init_database():
 
 
 @pytest.fixture(scope="function")
-def login_default_user():
+def default_user_token():
     user = User.find_by_username("Quyngao_dz_tqn")
     return encode_identity(identity=user.id)
 

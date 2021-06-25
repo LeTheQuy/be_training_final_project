@@ -78,8 +78,8 @@ class TestGetItemDetail(BaseCase):
         assert data["category"]["name"]
         assert data["editable"] is False
 
-    def test_get_editable_item_detail_successful(self, init_database, login_default_user):
-        status_code, data = self.test_client.get(url=f"/categories/1/items/1", access_token=login_default_user)
+    def test_get_editable_item_detail_successful(self, init_database, default_user_token):
+        status_code, data = self.test_client.get(url=f"/categories/1/items/1", access_token=default_user_token)
         assert status_code == 200
         assert type(data["id"]) is int
         assert data["title"]
@@ -88,14 +88,14 @@ class TestGetItemDetail(BaseCase):
         assert data["category"]["name"]
         assert data["editable"] is True
 
-    def test_item_not_found(self, init_database, login_default_user):
+    def test_item_not_found(self, init_database, default_user_token):
         status_code, data = self.test_client.get(url=f"/categories/1/items/1000")
         assert status_code == 400
         assert data["message"] == "Invalid item id"
 
 
 class TestAddItem(BaseCase):
-    def test_add_item_successful(self, init_database, login_default_user):
+    def test_add_item_successful(self, init_database, default_user_token):
         item_info = {
             "title": "Big Baby",
             "description": "Quy dzzzzzzzzzz   ",
@@ -103,7 +103,7 @@ class TestAddItem(BaseCase):
         category_id = 1
         status_code, data = self.test_client.post(url=f"/categories/{category_id}/items",
                                                   payload=item_info,
-                                                  access_token=login_default_user)
+                                                  access_token=default_user_token)
         assert status_code == 201
         assert data["message"] == "Item added"
         assert data["item"]["title"] == item_info["title"].lower().strip()
@@ -111,7 +111,7 @@ class TestAddItem(BaseCase):
         assert data["item"]["category"]["id"] == category_id
         assert data["item"]["category"]["name"]
 
-    def test_duplicated_item(self, init_database, login_default_user):
+    def test_duplicated_item(self, init_database, default_user_token):
         item_info = {
             "title": "Big Baby",
             "description": "Quy dzzzzzzzzzz   ",
@@ -119,12 +119,12 @@ class TestAddItem(BaseCase):
         category_id = 1
         status_code, data = self.test_client.post(url=f"/categories/{category_id}/items",
                                                   payload=item_info,
-                                                  access_token=login_default_user)
+                                                  access_token=default_user_token)
         assert status_code == 201
 
         status_code, data = self.test_client.post(url=f"/categories/{category_id}/items",
                                                   payload=item_info,
-                                                  access_token=login_default_user)
+                                                  access_token=default_user_token)
 
         assert status_code == 400
         assert data["message"] == "Duplicated item title"
@@ -142,7 +142,7 @@ class TestAddItem(BaseCase):
 
 
 class TestUpdateItem(BaseCase):
-    def test_edit_item_successful(self, init_database, login_default_user):
+    def test_edit_item_successful(self, init_database, default_user_token):
         updated_item_info = {
             "title": "Big Baby",
             "description": "Quy dzzzzzzzzzz",
@@ -151,7 +151,7 @@ class TestUpdateItem(BaseCase):
 
         status_code, data = self.test_client.put(url=f"/categories/1/items/1",
                                                  payload=updated_item_info,
-                                                 access_token=login_default_user)
+                                                 access_token=default_user_token)
 
         assert status_code == 200
         assert data["message"] == "Item updated"
@@ -182,7 +182,7 @@ class TestUpdateItem(BaseCase):
         assert status_code == 403
         assert data["message"] == "This item is not editable by yourself"
 
-    def test_new_category_not_found(self, init_database, login_default_user):
+    def test_new_category_not_found(self, init_database, default_user_token):
         updated_item_info = {
             "title": "Big Baby",
             "description": "Quy dzzzzzzzzzz",
@@ -191,28 +191,28 @@ class TestUpdateItem(BaseCase):
 
         status_code, data = self.test_client.put(url=f"/categories/1/items/1",
                                                  payload=updated_item_info,
-                                                 access_token=login_default_user)
+                                                 access_token=default_user_token)
 
         assert status_code == 400
         assert data["message"] == "Invalid new category id"
 
 
 class TestDeleteItem(BaseCase):
-    def test_delete_item_successful(self, init_database, login_default_user):
+    def test_delete_item_successful(self, init_database, default_user_token):
         status_code, data = self.test_client.delete(url=f"/categories/1/items/1",
-                                                    access_token=login_default_user)
+                                                    access_token=default_user_token)
         assert status_code == 200
         assert data["message"] == "Item deleted"
 
-    def test_invalid_access_token(self, init_database, login_default_user):
-        invalid_access_token = login_default_user + "xxx"
+    def test_invalid_access_token(self, init_database, default_user_token):
+        invalid_access_token = default_user_token + "xxx"
         status_code, data = self.test_client.delete(url=f"/categories/1/items/1",
                                                     access_token=invalid_access_token)
         assert status_code == 401
         assert data["message"] == "Unauthorized"
 
-    def test_item_and_category_dont_match(self, init_database, login_default_user):
+    def test_item_and_category_dont_match(self, init_database, default_user_token):
         status_code, data = self.test_client.delete(url=f"/categories/1/items/12",
-                                                    access_token=login_default_user)
+                                                    access_token=default_user_token)
         assert status_code == 400
         assert data["message"] == "Category and item don't match"
