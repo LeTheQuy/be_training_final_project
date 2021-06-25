@@ -1,9 +1,9 @@
 from main.db import db
-from .db_action import DBAction
+from .db_action import BaseAction
 from .item import Item
 
 
-class User(db.Model, DBAction):
+class User(db.Model, BaseAction):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)

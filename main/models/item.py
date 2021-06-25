@@ -1,10 +1,10 @@
 from sqlalchemy import desc
 
 from main.db import db
-from main.models.db_action import DBAction
+from main.models.db_action import BaseAction
 
 
-class Item(db.Model, DBAction):
+class Item(db.Model, BaseAction):
     __tablename__ = "items"
 
     id = db.Column(db.Integer, primary_key=True)

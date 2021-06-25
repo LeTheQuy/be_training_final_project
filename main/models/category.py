@@ -1,8 +1,8 @@
 from main.db import db
-from main.models.db_action import DBAction
+from main.models.db_action import BaseAction
 
 
-class Category(db.Model, DBAction):
+class Category(db.Model, BaseAction):
     __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
