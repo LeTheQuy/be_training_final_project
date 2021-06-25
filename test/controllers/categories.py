@@ -1,5 +1,3 @@
-import json
-
 from test.base_case import BaseCase
 
 
