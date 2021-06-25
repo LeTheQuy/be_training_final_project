@@ -8,13 +8,31 @@ class TestClient:
         self.client = client
         self.headers = {"Content-Type": "application/json"}
 
-    def post(self, url, payload):
-        data = json.dumps(payload)
-        return self.client.post(path=url, headers=self.headers, data=data)
+    def update_access_token_to_header(self, access_token):
+        headers = self.headers
+        if access_token:
+            headers["Authorization"] = access_token
+        return headers
 
-    def get(self, url, payload=None):
+    def post(self, url, payload, access_token=None):
         data = json.dumps(payload)
-        return self.client.get(path=url, headers=self.headers, data=data)
+        response = self.client.post(path=url, headers=self.update_access_token_to_header(access_token), data=data)
+        return response.status_code, json.loads(response.data)
+
+    def put(self, url, payload, access_token=None):
+        data = json.dumps(payload)
+        response = self.client.put(path=url, headers=self.update_access_token_to_header(access_token), data=data)
+        return response.status_code, json.loads(response.data)
+
+    def delete(self, url, payload=None, access_token=None):
+        data = json.dumps(payload)
+        response = self.client.delete(path=url, headers=self.update_access_token_to_header(access_token), data=data)
+        return response.status_code, json.loads(response.data)
+
+    def get(self, url, payload=None, access_token=None):
+        data = json.dumps(payload)
+        response = self.client.get(path=url, headers=self.update_access_token_to_header(access_token), data=data)
+        return response.status_code, json.loads(response.data)
 
 
 class BaseCase:
