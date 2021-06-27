@@ -8,8 +8,6 @@ from main.schemas.base.user import UserSchema
 from main.schemas.user_signup import UserSignUpSchema
 from main.helpers.schema import load_request_data_by_schema
 
-user_schema = UserSchema(exclude=("items",))
-
 
 @app.route("/auth/sign-up", methods=["POST"])
 @load_request_data_by_schema(UserSignUpSchema())
