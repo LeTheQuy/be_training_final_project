@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask
 
 from main.config.config import config
 
@@ -7,7 +7,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+pymysql://{config.MYSQL_USERNAME
                                         f"@{config.MYSQL_HOST}:{config.MYSQL_PORT}/{config.MYSQL_DB}"
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.secret_key = config.SECRET_KEY
 
 
 @app.errorhandler(404)
