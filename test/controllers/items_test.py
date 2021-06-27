@@ -166,7 +166,7 @@ class TestUpdateItem(BaseCase):
             "category_id": 2
         }
         sign_up_new_user_info = {
-            "username": "quy_dz_123456",
+            "username": "quy_dz_12345678",
             "password": "Quy@gotit123"
         }
         status_code, data = self.test_client.post(url="/auth/sign-up", payload=sign_up_new_user_info)
