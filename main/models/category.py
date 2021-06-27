@@ -11,10 +11,6 @@ class Category(db.Model, BaseAction):
     items = db.relationship("Item", lazy="dynamic")
 
     @classmethod
-    def find_by_id(cls, _id):
-        return cls.query.get(_id)
-
-    @classmethod
     def find_by_name(cls, name):
         return cls.query.filter_by(name=name).one_or_none()
 

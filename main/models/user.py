@@ -16,7 +16,3 @@ class User(db.Model, BaseAction):
     def find_by_username(cls, username):
         return cls.query.filter_by(username=username).one_or_none()
 
-    @classmethod
-    def find_by_id(cls, _id):
-        return cls.query.get(_id)
-

@@ -17,10 +17,6 @@ class Item(db.Model, BaseAction):
     user = db.relationship("User")
 
     @classmethod
-    def find_by_id(cls, _id):
-        return cls.query.get(_id)
-
-    @classmethod
     def find_by_title(cls, title):
         return cls.query.filter_by(title=title).one_or_none()
 
