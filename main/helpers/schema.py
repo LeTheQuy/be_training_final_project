@@ -16,7 +16,7 @@ def load_request_data_by_schema(schema):
                 request_data = schema.load(request_data)
             except ValidationError as err:
                 return {"message": err.messages}, 400
-            kwargs['request_data'] = request_data
+            kwargs["request_data"] = request_data
             return f(*args, **kwargs)
 
         return decorated
