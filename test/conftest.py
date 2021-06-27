@@ -11,8 +11,8 @@ from main.models.category import Category
 from main.models.item import Item
 from main.models.user import User
 
-if os.getenv('ENV') != 'test':
-    print('Tests should be run with "ENV=test"')
+if os.getenv("ENV") != "test":
+    print("Tests should be run with ENV=test")
     sys.exit(1)
 
 client = app.test_client()
@@ -38,18 +38,28 @@ def init_data():
             item.save_to_db()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session", autouse=True)
 def init_database():
     init_data()
     yield
     db.drop_all()
 
 
-@pytest.fixture(scope="function")
-def default_user_token():
+@pytest.fixture(scope="session")
+def default_user_token(init_database):
     user = User.find_by_username("Quyngao_dz_tqn")
     return encode_identity(identity=user.id)
 
 
-if __name__ == '__main__':
-    init_data()
+@pytest.fixture(scope="function", autouse=True)
+def session():
+    connection = db.engine.connect()
+    transaction = connection.begin()
+    options = dict(bind=connection, binds={})
+    session = db.create_scoped_session(options=options)
+
+    yield
+
+    session.close()
+    transaction.rollback()
+    connection.close()
