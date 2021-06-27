@@ -2,7 +2,7 @@ from test.base_case import BaseCase
 
 
 class TestGetLatestAddedItems(BaseCase):
-    def test_get_latest_with_items_per_page_successful(self, init_database):
+    def test_get_latest_with_items_per_page_successful(self):
         status_code, data = self.test_client.get(url="/items?order=newest&items_per_page=4")
         assert status_code == 200
         assert type(data["items"]) == list
@@ -14,7 +14,7 @@ class TestGetLatestAddedItems(BaseCase):
             assert item["category"]["id"]
             assert item["category"]["name"]
 
-    def test_get_all_items_without_items_per_page_param_successful(self, init_database):
+    def test_get_all_items_without_items_per_page_param_successful(self):
         status_code, data = self.test_client.get(url="items")
         assert status_code == 200
         assert data["items"]
@@ -26,14 +26,14 @@ class TestGetLatestAddedItems(BaseCase):
             assert item["category"]["id"]
             assert item["category"]["name"]
 
-    def test_invalid_order_param(self, init_database):
+    def test_invalid_order_param(self):
         status_code, data = self.test_client.get(url="items?order=oldest&items_per_page=4")
         assert status_code == 400
         assert data["message"]["order"][0] == "Must be one of: newest."
 
 
 class TestGetItemsByCategoryId(BaseCase):
-    def test_get_latest_with_items_per_page_successful(self, init_database):
+    def test_get_latest_with_items_per_page_successful(self):
         page = 1
         item_per_page = 20
         status_code, data = self.test_client.get(url=f"/categories/1/items?page={page}&items_per_page={item_per_page}")
@@ -51,7 +51,7 @@ class TestGetItemsByCategoryId(BaseCase):
             assert item["category"]["id"]
             assert item["category"]["name"]
 
-    def test_category_not_found(self, init_database):
+    def test_category_not_found(self):
         page = 1
         item_per_page = 20
         status_code, data = self.test_client.get(
@@ -59,7 +59,7 @@ class TestGetItemsByCategoryId(BaseCase):
         assert status_code == 400
         assert data["message"] == "Invalid category id"
 
-    def test_invalid_items_per_page(self, init_database):
+    def test_invalid_items_per_page(self):
         page = 1
         item_per_page = "abc"
         status_code, data = self.test_client.get(url=f"/categories/1/items?page={page}&items_per_page={item_per_page}")
@@ -68,7 +68,7 @@ class TestGetItemsByCategoryId(BaseCase):
 
 
 class TestGetItemDetail(BaseCase):
-    def test_get_item_detail_without_authorization_successful(self, init_database):
+    def test_get_item_detail_without_authorization_successful(self):
         status_code, data = self.test_client.get(url=f"/categories/1/items/1")
         assert status_code == 200
         assert type(data["id"]) is int
@@ -78,7 +78,7 @@ class TestGetItemDetail(BaseCase):
         assert data["category"]["name"]
         assert data["editable"] is False
 
-    def test_get_editable_item_detail_successful(self, init_database, default_user_token):
+    def test_get_editable_item_detail_successful(self, default_user_token):
         status_code, data = self.test_client.get(url=f"/categories/1/items/1", access_token=default_user_token)
         assert status_code == 200
         assert type(data["id"]) is int
@@ -88,14 +88,14 @@ class TestGetItemDetail(BaseCase):
         assert data["category"]["name"]
         assert data["editable"] is True
 
-    def test_item_not_found(self, init_database, default_user_token):
+    def test_item_not_found(self, default_user_token):
         status_code, data = self.test_client.get(url=f"/categories/1/items/1000")
         assert status_code == 400
         assert data["message"] == "Invalid item id"
 
 
 class TestAddItem(BaseCase):
-    def test_add_item_successful(self, init_database, default_user_token):
+    def test_add_item_successful(self, default_user_token):
         item_info = {
             "title": "Big Baby",
             "description": "Quy dzzzzzzzzzz   ",
@@ -111,9 +111,9 @@ class TestAddItem(BaseCase):
         assert data["item"]["category"]["id"] == category_id
         assert data["item"]["category"]["name"]
 
-    def test_duplicated_item(self, init_database, default_user_token):
+    def test_duplicated_item(self, default_user_token):
         item_info = {
-            "title": "Big Baby",
+            "title": "Fist Big Baby",
             "description": "Quy dzzzzzzzzzz   ",
         }
         category_id = 1
@@ -129,7 +129,7 @@ class TestAddItem(BaseCase):
         assert status_code == 400
         assert data["message"] == "Duplicated item title"
 
-    def test_add_item_without_user_authorization(self, init_database):
+    def test_add_item_without_user_authorization(self):
         item_info = {
             "title": "Big Baby",
             "description": "Quy dzzzzzzzzzz   ",
@@ -142,9 +142,9 @@ class TestAddItem(BaseCase):
 
 
 class TestUpdateItem(BaseCase):
-    def test_edit_item_successful(self, init_database, default_user_token):
+    def test_edit_item_successful(self, default_user_token):
         updated_item_info = {
-            "title": "Big Baby",
+            "title": "Big Edit Baby",
             "description": "Quy dzzzzzzzzzz",
             "category_id": 2
         }
@@ -152,7 +152,6 @@ class TestUpdateItem(BaseCase):
         status_code, data = self.test_client.put(url=f"/categories/1/items/1",
                                                  payload=updated_item_info,
                                                  access_token=default_user_token)
-
         assert status_code == 200
         assert data["message"] == "Item updated"
         assert data["item"]["title"] == updated_item_info["title"].lower().strip()
@@ -160,7 +159,7 @@ class TestUpdateItem(BaseCase):
         assert data["item"]["category"]["id"] == updated_item_info["category_id"]
         assert data["item"]["category"]["name"]
 
-    def test_permission_denied(self, init_database):
+    def test_permission_denied(self):
         updated_item_info = {
             "title": "Big Baby",
             "description": "Quy dzzzzzzzzzz",
@@ -176,20 +175,20 @@ class TestUpdateItem(BaseCase):
         status_code, data = self.test_client.post(url="/auth/sign-in", payload=sign_up_new_user_info)
         assert status_code == 200
 
-        status_code, data = self.test_client.put(url=f"/categories/1/items/1", payload=updated_item_info,
+        status_code, data = self.test_client.put(url=f"/categories/1/items/2", payload=updated_item_info,
                                                  access_token=data["access_token"])
 
         assert status_code == 403
         assert data["message"] == "This item is not editable by yourself"
 
-    def test_new_category_not_found(self, init_database, default_user_token):
+    def test_new_category_not_found(self, default_user_token):
         updated_item_info = {
             "title": "Big Baby",
             "description": "Quy dzzzzzzzzzz",
             "category_id": 10000
         }
 
-        status_code, data = self.test_client.put(url=f"/categories/1/items/1",
+        status_code, data = self.test_client.put(url=f"/categories/1/items/2",
                                                  payload=updated_item_info,
                                                  access_token=default_user_token)
 
@@ -198,20 +197,20 @@ class TestUpdateItem(BaseCase):
 
 
 class TestDeleteItem(BaseCase):
-    def test_delete_item_successful(self, init_database, default_user_token):
-        status_code, data = self.test_client.delete(url=f"/categories/1/items/1",
+    def test_delete_item_successful(self, default_user_token):
+        status_code, data = self.test_client.delete(url=f"/categories/1/items/2",
                                                     access_token=default_user_token)
         assert status_code == 200
         assert data["message"] == "Item deleted"
 
-    def test_invalid_access_token(self, init_database, default_user_token):
+    def test_invalid_access_token(self, default_user_token):
         invalid_access_token = default_user_token + "xxx"
-        status_code, data = self.test_client.delete(url=f"/categories/1/items/1",
+        status_code, data = self.test_client.delete(url=f"/categories/1/items/2",
                                                     access_token=invalid_access_token)
         assert status_code == 401
         assert data["message"] == "Unauthorized"
 
-    def test_item_and_category_dont_match(self, init_database, default_user_token):
+    def test_item_and_category_dont_match(self, default_user_token):
         status_code, data = self.test_client.delete(url=f"/categories/1/items/12",
                                                     access_token=default_user_token)
         assert status_code == 400
